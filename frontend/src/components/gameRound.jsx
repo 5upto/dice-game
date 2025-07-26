@@ -17,6 +17,30 @@ const GameRound = ({ gameData, firstPlayer, onGameEnd }) => {
   const [hmacData, setHmacData] = useState(null);
   const [isRolling, setIsRolling] = useState(false);
 
+  useEffect(() => {
+  if (
+    currentPlayer === 'computer' &&
+    selectedDice.computer === null &&
+    gameState === 'selecting'
+  ) {
+    const selectForComputer = async () => {
+      setLoading(true);
+      try {
+        const computerMove = await ApiService.getComputerMove(gameData.gameId, gameData.dice);
+        const computerIndex = gameData.dice.findIndex(dice =>
+          dice.name === computerMove.computerDiceName
+        );
+        setSelectedDice(prev => ({ ...prev, computer: computerIndex }));
+        setCurrentPlayer('player');
+      } catch (error) {
+        console.error('Error getting computer move:', error);
+      }
+      setLoading(false);
+    };
+    selectForComputer();
+  }
+}, [currentPlayer, selectedDice, gameState, gameData]);
+
   const selectDice = async (diceIndex) => {
     if (currentPlayer === 'player' && selectedDice.player === null) {
       setSelectedDice(prev => ({ ...prev, player: diceIndex }));
