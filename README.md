@@ -77,11 +77,15 @@ dice-game/
 ### Game Play
 ![Game Play](screenshots/Screenshot%20%28282%29.png)
 
+### Statistics View
+![Statistics View](screenshots/Screenshot%20%28284%29.png)
+
+### Game Play 2
+![Game Play 2](screenshots/Screenshot%20%28286%29.png)
+
 ### Results Screen
 ![Results Screen](screenshots/Screenshot%20%28287%29.png)
 
-### Statistics View
-![Statistics View](screenshots/Screenshot%20%28284%29.png)
 
 ### 
 
