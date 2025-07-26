@@ -1,31 +1,27 @@
-// server.js - Express.js Backend
 const express = require('express');
 const mysql = require('mysql2/promise');
 const cors = require('cors');
 const crypto = require('crypto');
 const { createHmac } = require('crypto');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// MySQL Connection
 const dbConfig = {
-  host: 'localhost',
-  user: 'root',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: 'dice_game'
+  database: process.env.DB_NAME,
 };
 
-// Initialize Database
 async function initDB() {
   try {
     const connection = await mysql.createConnection(dbConfig);
     
-    // Create games table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS games (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -38,7 +34,6 @@ async function initDB() {
       )
     `);
     
-    // Create rounds table
     await connection.execute(`
       CREATE TABLE IF NOT EXISTS rounds (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -64,9 +59,7 @@ async function initDB() {
   }
 }
 
-// Classes for game logic
 
-// Dice Configuration Parser
 class DiceConfigParser {
   static parse(diceStrings) {
     if (!Array.isArray(diceStrings) || diceStrings.length < 3) {
@@ -94,7 +87,6 @@ class DiceConfigParser {
   }
 }
 
-// Dice Class
 class Dice {
   constructor(faces, name) {
     this.faces = faces;
@@ -113,7 +105,6 @@ class Dice {
   }
 }
 
-// Fair Random Generator
 class FairRandomGenerator {
   static generateSecureKey() {
     return crypto.randomBytes(32).toString('hex'); // 256 bits
@@ -141,7 +132,6 @@ class FairRandomGenerator {
   }
 }
 
-// Probability Calculator
 class ProbabilityCalculator {
   static calculateWinProbabilities(dice) {
     const results = {};
@@ -174,7 +164,6 @@ class ProbabilityCalculator {
   }
 }
 
-// Table Generator
 class TableGenerator {
   static generateProbabilityTable(dice, probabilities) {
     const table = {
@@ -201,7 +190,6 @@ class TableGenerator {
   }
 }
 
-// Game Logic
 class GameLogic {
   constructor(diceConfig) {
     this.dice = diceConfig;
@@ -228,17 +216,14 @@ class GameLogic {
     const playerDice = this.dice[playerDiceIndex];
     const computerDice = this.dice[computerDiceIndex];
     
-    // Generate fair random for player roll
     const playerKey = FairRandomGenerator.generateSecureKey();
     const playerComputerNumber = FairRandomGenerator.generateSecureNumber(0, 5);
     const playerHmac = FairRandomGenerator.calculateHMAC(playerComputerNumber, playerKey);
     
-    // Generate fair random for computer roll
     const computerKey = FairRandomGenerator.generateSecureKey();
     const computerComputerNumber = FairRandomGenerator.generateSecureNumber(0, 5);
     const computerHmac = FairRandomGenerator.calculateHMAC(computerComputerNumber, computerKey);
     
-    // Calculate rolls
     const playerRollIndex = FairRandomGenerator.generateFairRoll(userNumber, playerComputerNumber, 6);
     const computerRollIndex = FairRandomGenerator.generateFairRoll(0, computerComputerNumber, 6); // Computer always inputs 0
     
@@ -265,9 +250,7 @@ class GameLogic {
   }
 }
 
-// API Routes
 
-// Initialize new game
 app.post('/api/game/init', async (req, res) => {
   try {
     const { diceConfig } = req.body;
@@ -297,7 +280,6 @@ app.post('/api/game/init', async (req, res) => {
   }
 });
 
-// Determine first player
 app.post('/api/game/:gameId/first-player', async (req, res) => {
   try {
     const gameLogic = new GameLogic([]); // We don't need dice for this
@@ -309,12 +291,10 @@ app.post('/api/game/:gameId/first-player', async (req, res) => {
   }
 });
 
-// Complete first player determination
 app.post('/api/game/:gameId/first-player/complete', async (req, res) => {
   try {
     const { userNumber, hmac, key, computerNumber } = req.body;
     
-    // Verify HMAC
     const calculatedHmac = FairRandomGenerator.calculateHMAC(computerNumber, key);
     if (calculatedHmac !== hmac) {
       return res.status(400).json({ error: 'HMAC verification failed' });
@@ -335,13 +315,11 @@ app.post('/api/game/:gameId/first-player/complete', async (req, res) => {
   }
 });
 
-// Play round
 app.post('/api/game/:gameId/play', async (req, res) => {
   try {
     const { gameId } = req.params;
     const { playerDiceIndex, computerDiceIndex, userNumber } = req.body;
     
-    // Get game data
     const connection = await mysql.createConnection(dbConfig);
     const [games] = await connection.execute(
       'SELECT * FROM games WHERE id = ?',
@@ -371,7 +349,6 @@ app.post('/api/game/:gameId/play', async (req, res) => {
        roundResult.playerComputerNumber, userNumber]
     );
     
-    // Update game stats
     const playerWins = game.player_wins + (roundResult.winner === 'player' ? 1 : 0);
     const computerWins = game.computer_wins + (roundResult.winner === 'computer' ? 1 : 0);
     
@@ -396,7 +373,6 @@ app.post('/api/game/:gameId/play', async (req, res) => {
   }
 });
 
-// Get computer dice selection
 app.post('/api/game/:gameId/computer-move', async (req, res) => {
   try {
     const { availableDice } = req.body;
@@ -411,7 +387,6 @@ app.post('/api/game/:gameId/computer-move', async (req, res) => {
   }
 });
 
-// Get game stats
 app.get('/api/game/:gameId/stats', async (req, res) => {
   try {
     const { gameId } = req.params;
@@ -442,7 +417,6 @@ app.get('/api/game/:gameId/stats', async (req, res) => {
   }
 });
 
-// Initialize database and start server
 initDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
