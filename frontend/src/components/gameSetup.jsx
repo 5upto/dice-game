@@ -113,7 +113,7 @@ const GameSetup = ({ onGameStart }) => {
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
           <h1 className="text-4xl font-bold text-center mb-4">
-            Non-Transitive Dice Game
+            Domino Dice
           </h1>
           <p className="text-center text-blue-100 max-w-2xl mx-auto">
             Experience the fascinating world of non-transitive dice with cryptographically secure randomness
@@ -174,8 +174,8 @@ const GameSetup = ({ onGameStart }) => {
                         value={input}
                         onChange={(e) => updateDice(index, e.target.value)}
                         className={`w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 transition-colors text-gray-900 ${isValid
-                            ? 'border-gray-300 focus:ring-blue-500'
-                            : 'border-red-300 focus:ring-red-500 bg-red-50'
+                          ? 'border-gray-300 focus:ring-blue-500'
+                          : 'border-red-300 focus:ring-red-500 bg-red-50'
                           }`}
                         placeholder="e.g., 1,2,3,4,5,6"
                       />

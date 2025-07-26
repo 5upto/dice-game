@@ -16,7 +16,7 @@ app.use(express.json());
 const dbConfig = {
   host: 'localhost',
   user: 'root',
-  password: 'your_password',
+  password: process.env.DB_PASSWORD,
   database: 'dice_game'
 };
 

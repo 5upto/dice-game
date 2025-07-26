@@ -1,4 +1,4 @@
-# Dice Game
+# Domino Dice
 
 A strategic dice game application built with React and Node.js. Players compete against the computer using customizable dice configurations.
 
