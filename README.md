@@ -78,10 +78,12 @@ dice-game/
 ![Game Play](screenshots/Screenshot%20%28282%29.png)
 
 ### Results Screen
-![Results Screen](screenshots/Screenshot%20%28283%29.png)
+![Results Screen](screenshots/Screenshot%20%28287%29.png)
 
 ### Statistics View
 ![Statistics View](screenshots/Screenshot%20%28284%29.png)
+
+### 
 
 ## Getting Started
 
